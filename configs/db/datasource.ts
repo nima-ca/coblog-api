@@ -1,7 +1,7 @@
-import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import configurations from 'configs/config';
+import { DataSource, DataSourceOptions } from 'typeorm';
 
-export const getTypeORMConfig = (): TypeOrmModuleOptions => {
+export const getDataSourceOptions = (): DataSourceOptions => {
     const config = configurations();
 
     return {
@@ -12,8 +12,12 @@ export const getTypeORMConfig = (): TypeOrmModuleOptions => {
         username: config.database.user,
         password: config.database.password,
 
-        entities: ['**/*.entity{.ts,.js}'],
+        logging: true,
+        synchronize: false,
+        entities: ['src/modules/**/*.entity.ts'],
         migrationsTableName: 'migration',
-        migrations: ['src/migration/*.ts'],
+        migrations: ['src/migrations/*.ts'],
     };
 };
+
+export const AppDataSource = new DataSource(getDataSourceOptions());

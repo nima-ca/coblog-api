@@ -1,13 +1,24 @@
+import { config } from 'dotenv';
+
+const envPath =
+    process.env.NODE_ENV === 'development'
+        ? 'configs/envs/.development.env'
+        : 'configs/envs/.production.env';
+
+const configs = config({
+    path: envPath,
+}).parsed;
+
 const configurations = () => ({
-    port: parseInt(process.env.PORT, 10) || 3000,
+    port: parseInt(configs.PORT, 10) || 3000,
     database: {
-        host: process.env.DB_HOST,
-        name: process.env.DB_DATABASE,
+        host: configs.DB_HOST,
+        name: configs.DB_DATABASE,
 
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
+        user: configs.DB_USER,
+        password: configs.DB_PASSWORD,
 
-        port: parseInt(process.env.DB_PORT, 10) || 5432,
+        port: parseInt(configs.DB_PORT, 10) || 5432,
     },
 });
 

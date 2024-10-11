@@ -2,13 +2,13 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import configurations from 'configs/config';
-import { getTypeORMConfig } from 'configs/db/orm.config';
-import { UserModule } from './user/user.module';
-import { PostModule } from './post/post.module';
-import { CommentModule } from './comment/comment.module';
-import { CategoryModule } from './category/category.module';
-import { TagModule } from './tag/tag.module';
-import { LikeModule } from './like/like.module';
+import { getDataSourceOptions } from 'configs/db/datasource';
+import { CategoryModule } from './modules/category/category.module';
+import { CommentModule } from './modules/comment/comment.module';
+import { PostModule } from './modules/post/post.module';
+import { ReactionModule } from './modules/reaction/reaction.module';
+import { TagModule } from './modules/tag/tag.module';
+import { UserModule } from './modules/user/user.module';
 
 @Module({
     imports: [
@@ -17,13 +17,17 @@ import { LikeModule } from './like/like.module';
             load: [configurations],
             envFilePath: './configs/envs/.development.env',
         }),
-        TypeOrmModule.forRoot(getTypeORMConfig()),
+        TypeOrmModule.forRoot({
+            ...getDataSourceOptions(),
+            autoLoadEntities: true,
+        }),
         UserModule,
         PostModule,
         CommentModule,
         CategoryModule,
         TagModule,
-        LikeModule,
+        ReactionModule,
+        ReactionModule,
     ],
     controllers: [],
     providers: [],
