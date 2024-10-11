@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import configurations from 'configs/config';
-import { getDataSourceOptions } from 'configs/db/datasource';
+import configurations from 'src/configs/config';
+import { getDBCredentials } from 'src/configs/db/datasource';
 import { CategoryModule } from './modules/category/category.module';
 import { CommentModule } from './modules/comment/comment.module';
 import { PostModule } from './modules/post/post.module';
@@ -15,10 +15,11 @@ import { UserModule } from './modules/user/user.module';
         ConfigModule.forRoot({
             isGlobal: true,
             load: [configurations],
-            envFilePath: './configs/envs/.development.env',
+            envFilePath: './src/configs/envs/.development.env',
         }),
         TypeOrmModule.forRoot({
-            ...getDataSourceOptions(),
+            type: 'postgres',
+            ...getDBCredentials(),
             autoLoadEntities: true,
         }),
         UserModule,

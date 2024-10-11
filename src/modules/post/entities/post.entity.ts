@@ -1,4 +1,4 @@
-import { CoreEntity } from 'src/common/models/core.entity';
+import { CoreEntity } from 'src/common/models/coreEntity';
 import { Category } from 'src/modules/category/entities/category.entity';
 import { Comment } from 'src/modules/comment/entities/comment.entity';
 import { Reaction } from 'src/modules/reaction/entities/reaction.entity';

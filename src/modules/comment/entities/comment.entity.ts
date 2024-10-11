@@ -1,4 +1,4 @@
-import { CoreEntity } from 'src/common/models/core.entity';
+import { CoreEntity } from 'src/common/models/coreEntity';
 import { Post } from 'src/modules/post/entities/post.entity';
 import { Reaction } from 'src/modules/reaction/entities/reaction.entity';
 import { User } from 'src/modules/user/entities/user.entity';
