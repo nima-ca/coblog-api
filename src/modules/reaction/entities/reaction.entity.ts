@@ -1,7 +1,7 @@
 import { CoreEntity } from 'src/common/models/coreEntity';
+import { User } from 'src/modules/auth/entities/user.entity';
 import { Comment } from 'src/modules/comment/entities/comment.entity';
 import { Post } from 'src/modules/post/entities/post.entity';
-import { User } from 'src/modules/user/entities/user.entity';
 import { Column, Entity, ManyToOne } from 'typeorm';
 
 export enum ReactionType {

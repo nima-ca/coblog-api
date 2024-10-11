@@ -1,26 +1,35 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { PGError } from 'src/common/errors/postgers.errors';
+import { Repository } from 'typeorm';
+import { User } from '../auth/entities/user.entity';
 
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
-  }
+    constructor(
+        @InjectRepository(User)
+        private readonly usersRepository: Repository<User>,
+    ) {}
 
-  findAll() {
-    return `This action returns all user`;
-  }
+    async create(user: User) {
+        try {
+            await this.usersRepository.insert(user);
+        } catch (error) {
+            if (error?.code === PGError.DUPLICATE_CONSTRAINT) {
+                throw new BadRequestException('email is already in use');
+            }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
+            throw error;
+        }
+    }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
+    async findOneByEmail(email: string): Promise<User | null> {
+        const user = await this.usersRepository.findOneBy({ email });
+        return user;
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
+    async findOneById(id: number): Promise<User | null> {
+        const user = await this.usersRepository.findOneBy({ id });
+        return user;
+    }
 }

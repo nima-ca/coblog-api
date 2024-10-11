@@ -1,9 +1,9 @@
 import { CoreEntity } from 'src/common/models/coreEntity';
+import { User } from 'src/modules/auth/entities/user.entity';
 import { Category } from 'src/modules/category/entities/category.entity';
 import { Comment } from 'src/modules/comment/entities/comment.entity';
 import { Reaction } from 'src/modules/reaction/entities/reaction.entity';
 import { Tag } from 'src/modules/tag/entities/tag.entity';
-import { User } from 'src/modules/user/entities/user.entity';
 import {
     Column,
     Entity,

@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import configurations from 'src/configs/config';
 import { getDBCredentials } from 'src/configs/db/datasource';
+import { AuthModule } from './modules/auth/auth.module';
 import { CategoryModule } from './modules/category/category.module';
 import { CommentModule } from './modules/comment/comment.module';
 import { PostModule } from './modules/post/post.module';
@@ -20,15 +21,17 @@ import { UserModule } from './modules/user/user.module';
         TypeOrmModule.forRoot({
             type: 'postgres',
             ...getDBCredentials(),
-            autoLoadEntities: true,
+            synchronize: false,
+            entities: ['dist/**/*.entity{.ts,.js}'],
         }),
-        UserModule,
         PostModule,
         CommentModule,
         CategoryModule,
         TagModule,
         ReactionModule,
         ReactionModule,
+        AuthModule,
+        UserModule,
     ],
     controllers: [],
     providers: [],

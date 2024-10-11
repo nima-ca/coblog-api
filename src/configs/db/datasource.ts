@@ -18,7 +18,6 @@ export const getDataSourceOptions = (): DataSourceOptions => {
         ...getDBCredentials(),
 
         logging: true,
-        synchronize: false,
         entities: ['src/modules/**/*.entity.{js,ts}'],
         migrationsTableName: 'migration',
         migrations: ['src/migrations/*.ts'],
