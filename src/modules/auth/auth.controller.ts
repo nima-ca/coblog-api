@@ -1,15 +1,23 @@
 import { Body, Controller, Post } from '@nestjs/common';
+import { CoreResponse } from 'src/common/dto/core.dto';
+import { OPERATION_SUCCESSFUL_MESSAGE } from 'src/common/messages/general.mesages';
 import { AuthService } from './auth.service';
 import { LoginDTO } from './dto/login.dto';
-import { RegisterDTO } from './dto/register.dto';
+import { RegisterDTO, RegisterResponseDTO } from './dto/register.dto';
 
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
     @Post('register')
-    register(@Body() dto: RegisterDTO) {
-        return this.authService.register(dto);
+    async register(
+        @Body() dto: RegisterDTO,
+    ): Promise<CoreResponse<RegisterResponseDTO>> {
+        await this.authService.register(dto);
+        return {
+            data: null,
+            message: OPERATION_SUCCESSFUL_MESSAGE,
+        };
     }
 
     @Post('login')
