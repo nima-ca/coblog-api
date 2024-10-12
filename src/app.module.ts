@@ -1,9 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import configurations from 'src/configs/config';
 import { getDBCredentials } from 'src/configs/db/datasource';
 import { AuthModule } from './modules/auth/auth.module';
+import { JwtGuard } from './modules/auth/guards/jwt.guard';
+import { RolesGuard } from './modules/auth/guards/role.guard';
+import { JwtStrategy } from './modules/auth/strategies/jwt.strategy';
 import { CategoryModule } from './modules/category/category.module';
 import { CommentModule } from './modules/comment/comment.module';
 import { PostModule } from './modules/post/post.module';
@@ -34,6 +38,16 @@ import { UserModule } from './modules/user/user.module';
         UserModule,
     ],
     controllers: [],
-    providers: [],
+    providers: [
+        {
+            provide: APP_GUARD,
+            useClass: JwtGuard,
+        },
+        {
+            provide: APP_GUARD,
+            useClass: RolesGuard,
+        },
+        JwtStrategy,
+    ],
 })
 export class AppModule {}

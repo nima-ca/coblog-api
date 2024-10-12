@@ -1,14 +1,18 @@
 import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import { customAlphabet } from 'nanoid';
 import { UserService } from '../user/user.service';
-import { LoginDTO } from './dto/login.dto';
 import { RegisterDTO } from './dto/register.dto';
 import { User, UserRole } from './entities/user.entity';
+import { AccessTokenPayload } from './interfaces/jwt.interface';
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly userService: UserService) {}
+    constructor(
+        private readonly jwtService: JwtService,
+        private readonly userService: UserService,
+    ) {}
 
     async register(dto: RegisterDTO): Promise<User> {
         const user = new User();
@@ -30,7 +34,22 @@ export class AuthService {
         return user;
     }
 
-    async login(dto: LoginDTO) {}
+    async validateUser(email: string, password: string): Promise<User | null> {
+        const user = await this.userService.findOneByEmail(email);
+        if (user && (await argon2.verify(user.password, password))) {
+            return user;
+        }
+
+        return null;
+    }
+
+    async login(user: User): Promise<{ accessToken: string }> {
+        user.lastLogin = new Date();
+        this.userService.update(user);
+
+        const payload: AccessTokenPayload = { sub: user.id, email: user.email };
+        return { accessToken: this.jwtService.sign(payload) };
+    }
 
     generateOTP() {
         const OTP_LENGTH = 6;

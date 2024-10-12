@@ -33,6 +33,7 @@ export class LoginResponseDTO {
         | 'id'
         | 'name'
         | 'email'
+        | 'role'
         | 'isVerified'
         | 'lastLogin'
         | 'createdAt'

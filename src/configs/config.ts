@@ -20,6 +20,13 @@ const configurations = () => ({
 
         port: parseInt(configs.DB_PORT, 10) || 5432,
     },
+
+    auth: {
+        jwt: {
+            secretKey: configs.JWT_SECRET_KEY,
+            expireIn: configs.JWT_EXPIRE,
+        },
+    },
 });
 
 export default configurations;

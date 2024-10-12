@@ -23,6 +23,10 @@ export class UserService {
         }
     }
 
+    async update(user: User) {
+        await this.usersRepository.update({ id: user.id }, user);
+    }
+
     async findOneByEmail(email: string): Promise<User | null> {
         const user = await this.usersRepository.findOneBy({ email });
         return user;
