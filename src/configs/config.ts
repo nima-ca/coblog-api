@@ -11,6 +11,7 @@ const configs = config({
 
 const configurations = () => ({
     port: parseInt(configs.PORT, 10) || 3000,
+    frontEndDomain: configs.FRONT_END_DOMAIN,
     database: {
         host: configs.DB_HOST,
         name: configs.DB_DATABASE,
@@ -25,6 +26,13 @@ const configurations = () => ({
         jwt: {
             secretKey: configs.JWT_SECRET_KEY,
             expireIn: configs.JWT_EXPIRE,
+        },
+
+        google: {
+            clientId: configs.GOOGLE_CLIENT_ID,
+            clientSecret: configs.GOOGLE_CLIENT_SECRET,
+            callbackUrl: configs.GOOGLE_CALLBACK_URL,
+            frontEndRedirectPath: configs.GOOGLE_AUTH_REDIRECT_FRONT_END_PATH,
         },
     },
 });

@@ -7,6 +7,7 @@ import { getDBCredentials } from 'src/configs/db/datasource';
 import { AuthModule } from './modules/auth/auth.module';
 import { JwtGuard } from './modules/auth/guards/jwt.guard';
 import { RolesGuard } from './modules/auth/guards/role.guard';
+import { GoogleStrategy } from './modules/auth/strategies/google.strategies';
 import { JwtStrategy } from './modules/auth/strategies/jwt.strategy';
 import { CategoryModule } from './modules/category/category.module';
 import { CommentModule } from './modules/comment/comment.module';
@@ -48,6 +49,7 @@ import { UserModule } from './modules/user/user.module';
             useClass: RolesGuard,
         },
         JwtStrategy,
+        GoogleStrategy,
     ],
 })
 export class AppModule {}

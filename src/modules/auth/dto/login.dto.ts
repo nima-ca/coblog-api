@@ -6,7 +6,7 @@ import {
     MinLength,
 } from 'class-validator';
 import { STRONG_PASSWORD_REGEX } from 'src/common/regex/regex';
-import { User } from '../entities/user.entity';
+import { User } from '../../user/entities/user.entity';
 
 export class LoginDTO {
     @IsString()

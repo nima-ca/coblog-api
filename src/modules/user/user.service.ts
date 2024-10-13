@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PGError } from 'src/common/errors/postgers.errors';
 import { Repository } from 'typeorm';
-import { User } from '../auth/entities/user.entity';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
@@ -13,7 +13,9 @@ export class UserService {
 
     async create(user: User) {
         try {
-            await this.usersRepository.insert(user);
+            const result = await this.usersRepository.insert(user);
+
+            console.log(result);
         } catch (error) {
             if (error?.code === PGError.DUPLICATE_CONSTRAINT) {
                 throw new BadRequestException('email is already in use');

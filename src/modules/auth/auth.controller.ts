@@ -1,16 +1,30 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    Post,
+    Request,
+    Res,
+    UseGuards,
+} from '@nestjs/common';
+import { Response } from 'express';
 import { CoreResponse } from 'src/common/dto/core.dto';
 import { OPERATION_SUCCESSFUL_MESSAGE } from 'src/common/messages/general.mesages';
+import { User } from '../user/entities/user.entity';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
 import { GetUser } from './decorators/user.decorator';
 import { LoginResponseDTO } from './dto/login.dto';
 import { RegisterDTO, RegisterResponseDTO } from './dto/register.dto';
-import { User } from './entities/user.entity';
+import { GoogleOAuthGuard } from './guards/google.guard';
 import { LocalAuthGuard } from './guards/local.guard';
+import { GoogleUserProfileInfo } from './interfaces/google.interface';
 
 @Public()
-@Controller('auth')
+@Controller({
+    path: 'auth',
+    version: '1',
+})
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
@@ -49,5 +63,19 @@ export class AuthController {
                 },
             },
         };
+    }
+
+    @Get('google')
+    @UseGuards(GoogleOAuthGuard)
+    async googleAuth(@Request() req) {}
+
+    @Get('google-redirect')
+    @UseGuards(GoogleOAuthGuard)
+    async googleAuthRedirect(
+        @Res() res: Response,
+        @GetUser() user: GoogleUserProfileInfo,
+    ) {
+        const { redirectUrl } = await this.authService.googleLogin(user);
+        return res.redirect(redirectUrl);
     }
 }

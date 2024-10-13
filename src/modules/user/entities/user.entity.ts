@@ -9,6 +9,11 @@ export enum UserRole {
     Admin = 'admin',
 }
 
+export enum UserProvider {
+    Google = 'google',
+    Password = 'password',
+}
+
 @Entity()
 export class User extends CoreEntity {
     @Column()
@@ -20,8 +25,18 @@ export class User extends CoreEntity {
     @Column()
     password: string;
 
-    @Column({ type: 'enum', enum: UserRole })
+    @Column({ nullable: true, default: null })
+    profilePicture: string;
+
+    @Column({ type: 'enum', enum: UserRole, default: UserRole.User })
     role: UserRole;
+
+    @Column({
+        type: 'enum',
+        enum: UserProvider,
+        default: UserProvider.Password,
+    })
+    provider: UserProvider;
 
     @Column({ default: false })
     isVerified: boolean;
