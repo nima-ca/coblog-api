@@ -1,5 +1,11 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { IsArray, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+    IsArray,
+    IsBoolean,
+    IsNotEmpty,
+    IsNumber,
+    IsString,
+} from 'class-validator';
 import { Post } from '../entities/post.entity';
 
 export class CreatePostDto {
@@ -14,6 +20,9 @@ export class CreatePostDto {
     @IsArray()
     @IsNumber({}, { each: true })
     categories: number[];
+
+    @IsBoolean()
+    isPublished: boolean;
 
     @IsArray()
     @IsString({ each: true })

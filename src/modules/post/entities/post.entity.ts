@@ -21,6 +21,9 @@ export class Post extends CoreEntity {
     @Column('text')
     content: string;
 
+    @Column({ default: false })
+    isPublished: boolean;
+
     @ManyToOne(() => User, (user) => user.posts)
     author: User;
 

@@ -7,7 +7,9 @@ import {
     Patch,
     Post,
 } from '@nestjs/common';
+import { GetQueryRunner } from 'src/common/decorators/transaction.decorator';
 import { CoreResponse } from 'src/common/dto/core.dto';
+import { QueryRunner } from 'typeorm';
 import { Roles } from '../auth/decorators/role.decorator';
 import { GetUser } from '../auth/decorators/user.decorator';
 import { User, UserRole } from '../user/entities/user.entity';
@@ -25,8 +27,9 @@ export class PostController {
     async create(
         @Body() createPostDto: CreatePostDto,
         @GetUser() user: User,
+        @GetQueryRunner() qr: QueryRunner,
     ): Promise<CoreResponse<CreatePostResponseDto>> {
-        const result = await this.postService.create(createPostDto, user);
+        const result = await this.postService.create(createPostDto, user, qr);
         return CreatePostMapper(result);
     }
 

@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import configurations from 'src/configs/config';
 import { getDBCredentials } from 'src/configs/db/datasource';
+import { TransactionMiddleware } from './common/middleware/transaction.middleware';
 import { AuthModule } from './modules/auth/auth.module';
 import { JwtGuard } from './modules/auth/guards/jwt.guard';
 import { RolesGuard } from './modules/auth/guards/role.guard';
@@ -52,4 +53,8 @@ import { UserModule } from './modules/user/user.module';
         GoogleStrategy,
     ],
 })
-export class AppModule {}
+export class AppModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(TransactionMiddleware).forRoutes('*');
+    }
+}

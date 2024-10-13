@@ -4,7 +4,7 @@ import { Column, Entity, ManyToMany } from 'typeorm';
 
 @Entity()
 export class Category extends CoreEntity {
-    @Column()
+    @Column({ unique: true })
     name: string;
 
     @ManyToMany(() => Post, (post) => post.categories)
