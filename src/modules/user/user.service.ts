@@ -13,9 +13,7 @@ export class UserService {
 
     async create(user: User) {
         try {
-            const result = await this.usersRepository.insert(user);
-
-            console.log(result);
+            await this.usersRepository.insert(user);
         } catch (error) {
             if (error?.code === PGError.DUPLICATE_CONSTRAINT) {
                 throw new BadRequestException('email is already in use');

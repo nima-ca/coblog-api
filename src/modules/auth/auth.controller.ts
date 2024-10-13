@@ -21,10 +21,7 @@ import { LocalAuthGuard } from './guards/local.guard';
 import { GoogleUserProfileInfo } from './interfaces/google.interface';
 
 @Public()
-@Controller({
-    path: 'auth',
-    version: '1',
-})
+@Controller({ path: 'auth', version: '1' })
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
