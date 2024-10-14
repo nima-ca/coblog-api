@@ -7,6 +7,9 @@ export class Category extends CoreEntity {
     @Column({ unique: true })
     name: string;
 
-    @ManyToMany(() => Post, (post) => post.categories)
+    @ManyToMany(() => Post, (post) => post.categories, {
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+    })
     posts: Post[];
 }
