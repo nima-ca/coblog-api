@@ -1,10 +1,23 @@
-import { Body, Controller, Delete, Param, Patch, Post } from '@nestjs/common';
-import { CoreResponse } from 'src/common/dto/core.dto';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Param,
+    Patch,
+    Post,
+    Query,
+} from '@nestjs/common';
+import { CorePaginatedResponse, CoreResponse } from 'src/common/dto/core.dto';
 import { OPERATION_SUCCESSFUL_MESSAGE } from 'src/common/messages/general.mesages';
 import { GetUser } from '../auth/decorators/user.decorator';
 import { User } from '../user/entities/user.entity';
 import { CommentService } from './comment.service';
 import { CreateCommentDto, CreateCommentMapper } from './dto/createComment.dto';
+import {
+    FindAllCommentsMapper,
+    FindAllCommentsQueryDto,
+} from './dto/findCommnets.dto';
 import { UpdateCommentDto, UpdateCommentMapper } from './dto/updateComment.dto';
 import { Comment } from './entities/comment.entity';
 
@@ -19,6 +32,14 @@ export class CommentController {
     ): Promise<CoreResponse<Comment>> {
         const result = await this.commentService.create(createCommentDto, user);
         return CreateCommentMapper(result);
+    }
+
+    @Get()
+    async findAll(
+        @Query() query: FindAllCommentsQueryDto,
+    ): Promise<CorePaginatedResponse<Comment[]>> {
+        const result = await this.commentService.findAll(query);
+        return FindAllCommentsMapper(result);
     }
 
     @Patch(':id')
