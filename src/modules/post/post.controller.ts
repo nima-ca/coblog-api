@@ -4,18 +4,33 @@ import {
     Delete,
     Get,
     Param,
-    Patch,
     Post,
+    Put,
+    Query,
 } from '@nestjs/common';
 import { GetQueryRunner } from 'src/common/decorators/transaction.decorator';
 import { CoreResponse } from 'src/common/dto/core.dto';
+import { OPERATION_SUCCESSFUL_MESSAGE } from 'src/common/messages/general.mesages';
 import { QueryRunner } from 'typeorm';
 import { Roles } from '../auth/decorators/role.decorator';
 import { GetUser } from '../auth/decorators/user.decorator';
 import { User, UserRole } from '../user/entities/user.entity';
-import { CreatePostDto, CreatePostResponseDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
-import { CreatePostMapper } from './mapper/createPost.mapper';
+import {
+    CreatePostDto,
+    CreatePostMapper,
+    CreatePostResponseDto,
+} from './dto/createPost.dto';
+import {
+    FindAllPostsMapper,
+    FindPostMapper,
+    FindPostsQueryDto,
+} from './dto/findPost.dto';
+import {
+    UpdatePostDto,
+    UpdatePostMapper,
+    UpdatePostResponseDto,
+} from './dto/updatePost.dto';
+import { Post as PostEntity } from './entities/post.entity';
 import { PostService } from './post.service';
 
 @Controller({ path: 'post', version: '1' })
@@ -34,24 +49,32 @@ export class PostController {
     }
 
     @Get()
-    findAll() {
-        return this.postService.findAll();
+    async findAll(@Query() query: FindPostsQueryDto) {
+        const result = await this.postService.findAll(query);
+        return FindAllPostsMapper(result);
     }
 
     @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.postService.findOne(+id);
+    async findOne(@Param('id') id: string): Promise<CoreResponse<PostEntity>> {
+        const result = await this.postService.findOne(+id);
+        return FindPostMapper(result);
     }
 
     @Roles(UserRole.Admin)
-    @Patch(':id')
-    update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-        return this.postService.update(+id, updatePostDto);
+    @Put(':id')
+    async update(
+        @Param('id') id: string,
+        @GetQueryRunner() qr: QueryRunner,
+        @Body() updatePostDto: UpdatePostDto,
+    ): Promise<CoreResponse<UpdatePostResponseDto>> {
+        const result = await this.postService.update(+id, updatePostDto, qr);
+        return UpdatePostMapper(result);
     }
 
     @Roles(UserRole.Admin)
     @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.postService.remove(+id);
+    async remove(@Param('id') id: string): Promise<CoreResponse> {
+        await this.postService.remove(+id);
+        return { message: OPERATION_SUCCESSFUL_MESSAGE };
     }
 }

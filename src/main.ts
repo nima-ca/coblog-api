@@ -1,6 +1,10 @@
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import {
+    ClassSerializerInterceptor,
+    ValidationPipe,
+    VersioningType,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -11,12 +15,15 @@ async function bootstrap() {
         new ValidationPipe({
             transform: true,
             whitelist: true,
-            transformOptions: { enableImplicitConversion: true },
         }),
     );
 
     // Version config
     app.enableVersioning({ type: VersioningType.URI });
+
+    app.useGlobalInterceptors(
+        new ClassSerializerInterceptor(app.get(Reflector)),
+    );
 
     const configService = app.get(ConfigService);
     const port = configService.get('PORT');

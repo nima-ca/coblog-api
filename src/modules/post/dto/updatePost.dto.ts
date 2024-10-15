@@ -1,17 +1,17 @@
 import { CoreResponse } from 'src/common/dto/core.dto';
 import { OPERATION_SUCCESSFUL_MESSAGE } from 'src/common/messages/general.mesages';
-import { CreatePostResponseDto } from '../dto/create-post.dto';
 import { Post } from '../entities/post.entity';
+import { CreatePostDto } from './createPost.dto';
 
-export const CreatePostMapper = (
+export class UpdatePostDto extends CreatePostDto {}
+
+export class UpdatePostResponseDto extends Post {}
+
+export const UpdatePostMapper = (
     post: Post,
-): CoreResponse<CreatePostResponseDto> => {
+): CoreResponse<UpdatePostResponseDto> => {
     return {
-        data: {
-            id: post.id,
-            title: post.title,
-            content: post.content,
-        },
+        data: post,
         message: OPERATION_SUCCESSFUL_MESSAGE,
     };
 };
