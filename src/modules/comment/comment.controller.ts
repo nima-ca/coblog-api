@@ -1,34 +1,46 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Delete, Param, Patch, Post } from '@nestjs/common';
+import { CoreResponse } from 'src/common/dto/core.dto';
+import { OPERATION_SUCCESSFUL_MESSAGE } from 'src/common/messages/general.mesages';
+import { GetUser } from '../auth/decorators/user.decorator';
+import { User } from '../user/entities/user.entity';
 import { CommentService } from './comment.service';
-import { CreateCommentDto } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
+import { CreateCommentDto, CreateCommentMapper } from './dto/createComment.dto';
+import { UpdateCommentDto, UpdateCommentMapper } from './dto/updateComment.dto';
+import { Comment } from './entities/comment.entity';
 
-@Controller('comment')
+@Controller({ path: 'comment', version: '1' })
 export class CommentController {
-  constructor(private readonly commentService: CommentService) {}
+    constructor(private readonly commentService: CommentService) {}
 
-  @Post()
-  create(@Body() createCommentDto: CreateCommentDto) {
-    return this.commentService.create(createCommentDto);
-  }
+    @Post()
+    async create(
+        @Body() createCommentDto: CreateCommentDto,
+        @GetUser() user: User,
+    ): Promise<CoreResponse<Comment>> {
+        const result = await this.commentService.create(createCommentDto, user);
+        return CreateCommentMapper(result);
+    }
 
-  @Get()
-  findAll() {
-    return this.commentService.findAll();
-  }
+    @Patch(':id')
+    async update(
+        @GetUser() user: User,
+        @Param('id') id: string,
+        @Body() updateCommentDto: UpdateCommentDto,
+    ): Promise<CoreResponse<Comment>> {
+        const result = await this.commentService.update(
+            +id,
+            updateCommentDto,
+            user,
+        );
+        return UpdateCommentMapper(result);
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.commentService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
-    return this.commentService.update(+id, updateCommentDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.commentService.remove(+id);
-  }
+    @Delete(':id')
+    async remove(
+        @Param('id') id: string,
+        @GetUser() user: User,
+    ): Promise<CoreResponse> {
+        await this.commentService.remove(+id, user);
+        return { message: OPERATION_SUCCESSFUL_MESSAGE };
+    }
 }

@@ -1,26 +1,89 @@
-import { Injectable } from '@nestjs/common';
-import { CreateCommentDto } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
+import {
+    BadRequestException,
+    ForbiddenException,
+    Injectable,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Post } from '../post/entities/post.entity';
+import { User, UserRole } from '../user/entities/user.entity';
+import { CreateCommentDto } from './dto/createComment.dto';
+import { UpdateCommentDto } from './dto/updateComment.dto';
+import { Comment } from './entities/comment.entity';
 
 @Injectable()
 export class CommentService {
-  create(createCommentDto: CreateCommentDto) {
-    return 'This action adds a new comment';
-  }
+    constructor(
+        @InjectRepository(Comment)
+        private readonly commentsRepository: Repository<Comment>,
 
-  findAll() {
-    return `This action returns all comment`;
-  }
+        @InjectRepository(Post)
+        private readonly postsRepository: Repository<Post>,
+    ) {}
 
-  findOne(id: number) {
-    return `This action returns a #${id} comment`;
-  }
+    async create(
+        createCommentDto: CreateCommentDto,
+        user: User,
+    ): Promise<Comment> {
+        const post = await this.postsRepository.findOneBy({
+            id: createCommentDto.postId,
+        });
 
-  update(id: number, updateCommentDto: UpdateCommentDto) {
-    return `This action updates a #${id} comment`;
-  }
+        if (!post) {
+            throw new BadRequestException('post not found');
+        }
 
-  remove(id: number) {
-    return `This action removes a #${id} comment`;
-  }
+        const comment = await this.commentsRepository.save({
+            post,
+            user,
+            content: createCommentDto.content,
+        });
+
+        return comment;
+    }
+
+    async update(id: number, updateCommentDto: UpdateCommentDto, user: User) {
+        const comment = await this.commentsRepository.findOne({
+            where: { id },
+            relations: {
+                user: true,
+            },
+        });
+
+        if (!comment) {
+            throw new BadRequestException('comment not found');
+        }
+
+        if (comment.user.id !== user.id) {
+            throw new ForbiddenException(
+                "you do not have access to other's comment",
+            );
+        }
+
+        comment.content = updateCommentDto.content;
+        this.commentsRepository.save(comment);
+
+        return comment;
+    }
+
+    async remove(id: number, user: User) {
+        const comment = await this.commentsRepository.findOne({
+            where: { id },
+            relations: {
+                user: true,
+            },
+        });
+
+        if (!comment) {
+            throw new BadRequestException('comment not found');
+        }
+
+        if (comment.user.id !== user.id && user.role !== UserRole.Admin) {
+            throw new ForbiddenException(
+                "you do not have access to other's comment",
+            );
+        }
+
+        await this.commentsRepository.delete({ id: comment.id });
+    }
 }
