@@ -23,7 +23,7 @@ import { UserModule } from './modules/user/user.module';
         ConfigModule.forRoot({
             isGlobal: true,
             load: [configurations],
-            envFilePath: './src/configs/envs/.development.env',
+            envFilePath: `.${process.env.NODE_ENV}.env`,
         }),
         ThrottlerModule.forRoot([{ ttl: seconds(1), limit: 10 }]),
         TypeOrmModule.forRoot({

@@ -2,8 +2,8 @@ import { config } from 'dotenv';
 
 const envPath =
     process.env.NODE_ENV === 'development'
-        ? 'src/configs/envs/.development.env'
-        : 'src/configs/envs/.production.env';
+        ? '.development.env'
+        : './dist/.production.env';
 
 const configs = config({
     path: envPath,
