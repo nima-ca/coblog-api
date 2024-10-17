@@ -11,11 +11,11 @@ import { Tag } from '../entities/tag.entity';
 export class FindAllTagsQueryDto extends CorePaginationQueryDto {
     @IsOptional()
     @IsString()
-    search: string;
+    search?: string;
 
     @IsOptional()
     @IsEnum(OrderDirection)
-    order: OrderDirection;
+    order?: OrderDirection;
 }
 
 export const FindAllTagsMapper = (

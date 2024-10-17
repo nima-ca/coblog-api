@@ -8,6 +8,7 @@ import {
     Put,
     Query,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GetQueryRunner } from 'src/common/decorators/transaction.decorator';
 import { CoreResponse } from 'src/common/dto/core.dto';
 import { OPERATION_SUCCESSFUL_MESSAGE } from 'src/common/messages/general.mesages';
@@ -34,6 +35,8 @@ import {
 import { Post as PostEntity } from './entities/post.entity';
 import { PostService } from './post.service';
 
+@ApiBearerAuth()
+@ApiTags(`post`)
 @Controller({ path: 'post', version: '1' })
 export class PostController {
     constructor(private readonly postService: PostService) {}
@@ -83,6 +86,7 @@ export class PostController {
     }
 }
 
+@ApiTags(`post`)
 @Controller({ path: 'public/post', version: '1' })
 export class PublicPostController {
     constructor(private readonly postService: PostService) {}

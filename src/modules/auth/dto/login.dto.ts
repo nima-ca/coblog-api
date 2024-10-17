@@ -10,10 +10,6 @@ import { User } from '../../user/entities/user.entity';
 
 export class LoginDTO {
     @IsString()
-    @MinLength(2)
-    name: string;
-
-    @IsString()
     @IsEmail()
     email: string;
 

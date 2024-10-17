@@ -8,6 +8,7 @@ import {
     Post,
     Query,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CorePaginatedResponse, CoreResponse } from 'src/common/dto/core.dto';
 import { OPERATION_SUCCESSFUL_MESSAGE } from 'src/common/messages/general.mesages';
 import { Public } from '../auth/decorators/public.decorator';
@@ -22,6 +23,8 @@ import {
 import { UpdateCommentDto, UpdateCommentMapper } from './dto/updateComment.dto';
 import { Comment } from './entities/comment.entity';
 
+@ApiBearerAuth()
+@ApiTags(`comment`)
 @Controller({ path: 'comment', version: '1' })
 export class CommentController {
     constructor(private readonly commentService: CommentService) {}
@@ -68,6 +71,7 @@ export class CommentController {
     }
 }
 
+@ApiTags(`comment`)
 @Controller({ path: 'public/comment', version: '1' })
 export class PublicCommentController {
     constructor(private readonly commentService: CommentService) {}

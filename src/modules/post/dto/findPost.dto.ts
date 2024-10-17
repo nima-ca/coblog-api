@@ -20,28 +20,28 @@ import { Post } from '../entities/post.entity';
 export class FindPostsQueryDto extends CorePaginationQueryDto {
     @IsOptional()
     @IsString()
-    search: string;
+    search?: string;
 
     @IsOptional()
     @IsEnum(OrderDirection)
-    order: OrderDirection;
+    order?: OrderDirection;
 
     @IsOptional()
     @IsInt()
     @Min(1)
     @Transform(({ value }) => parseInt(value, 10))
-    categoryId: number;
+    categoryId?: number;
 
     @IsOptional()
     @IsInt()
     @Min(1)
     @Transform(({ value }) => parseInt(value, 10))
-    tagId: number;
+    tagId?: number;
 
     @IsOptional()
     @IsBoolean()
     @Transform(({ value }) => value === 'true')
-    isPublished: boolean;
+    isPublished?: boolean;
 }
 
 export const FindAllPostsMapper = (

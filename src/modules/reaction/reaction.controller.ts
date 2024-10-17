@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Param, Post } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CoreResponse } from 'src/common/dto/core.dto';
 import { OPERATION_SUCCESSFUL_MESSAGE } from 'src/common/messages/general.mesages';
 import { GetUser } from '../auth/decorators/user.decorator';
@@ -10,7 +11,8 @@ import {
     ReactToPostDto,
 } from './dto/createReaction.dto';
 import { ReactionService } from './reaction.service';
-
+@ApiBearerAuth()
+@ApiTags(`reaction`)
 @Controller({ path: 'reaction', version: '1' })
 export class ReactionController {
     constructor(private readonly reactionService: ReactionService) {}

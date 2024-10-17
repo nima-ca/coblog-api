@@ -8,6 +8,7 @@ import {
     Post,
     Query,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CorePaginatedResponse, CoreResponse } from 'src/common/dto/core.dto';
 import { OPERATION_SUCCESSFUL_MESSAGE } from 'src/common/messages/general.mesages';
 import { Public } from '../auth/decorators/public.decorator';
@@ -31,6 +32,8 @@ import {
 } from './dto/updateCategory.dto';
 import { Category } from './entities/category.entity';
 
+@ApiBearerAuth()
+@ApiTags(`category`)
 @Controller({ path: 'category', version: '1' })
 export class CategoryController {
     constructor(private readonly categoryService: CategoryService) {}

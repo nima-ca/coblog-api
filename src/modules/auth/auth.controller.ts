@@ -7,6 +7,7 @@ import {
     Res,
     UseGuards,
 } from '@nestjs/common';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { CoreResponse } from 'src/common/dto/core.dto';
 import { OPERATION_SUCCESSFUL_MESSAGE } from 'src/common/messages/general.mesages';
@@ -14,13 +15,14 @@ import { User } from '../user/entities/user.entity';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
 import { GetUser } from './decorators/user.decorator';
-import { LoginResponseDTO } from './dto/login.dto';
+import { LoginDTO, LoginResponseDTO } from './dto/login.dto';
 import { RegisterDTO, RegisterResponseDTO } from './dto/register.dto';
 import { GoogleOAuthGuard } from './guards/google.guard';
 import { LocalAuthGuard } from './guards/local.guard';
 import { GoogleUserProfileInfo } from './interfaces/google.interface';
 
 @Public()
+@ApiTags(`auth`)
 @Controller({ path: 'auth', version: '1' })
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
@@ -38,6 +40,7 @@ export class AuthController {
 
     @UseGuards(LocalAuthGuard)
     @Post('login')
+    @ApiBody({ type: LoginDTO })
     async login(
         @GetUser() user: User,
     ): Promise<CoreResponse<LoginResponseDTO>> {
