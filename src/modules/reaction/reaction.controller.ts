@@ -1,34 +1,53 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Delete, Param, Post } from '@nestjs/common';
+import { CoreResponse } from 'src/common/dto/core.dto';
+import { OPERATION_SUCCESSFUL_MESSAGE } from 'src/common/messages/general.mesages';
+import { GetUser } from '../auth/decorators/user.decorator';
+import { User } from '../user/entities/user.entity';
+import {
+    CreateReactionMapper,
+    CreateReactionResponseDto,
+    ReactToCommentDto,
+    ReactToPostDto,
+} from './dto/createReaction.dto';
 import { ReactionService } from './reaction.service';
-import { CreateReactionDto } from './dto/create-reaction.dto';
-import { UpdateReactionDto } from './dto/update-reaction.dto';
 
-@Controller('reaction')
+@Controller({ path: 'reaction', version: '1' })
 export class ReactionController {
-  constructor(private readonly reactionService: ReactionService) {}
+    constructor(private readonly reactionService: ReactionService) {}
 
-  @Post()
-  create(@Body() createReactionDto: CreateReactionDto) {
-    return this.reactionService.create(createReactionDto);
-  }
+    @Post('post')
+    async reactToPost(
+        @Body() dto: ReactToPostDto,
+        @GetUser() user: User,
+    ): Promise<CoreResponse<CreateReactionResponseDto>> {
+        const result = await this.reactionService.reactToPost(dto, user);
+        return CreateReactionMapper(result);
+    }
 
-  @Get()
-  findAll() {
-    return this.reactionService.findAll();
-  }
+    @Post('comment')
+    async reactToComment(
+        @Body() dto: ReactToCommentDto,
+        @GetUser() user: User,
+    ): Promise<CoreResponse<CreateReactionResponseDto>> {
+        const result = await this.reactionService.reactToComment(dto, user);
+        return CreateReactionMapper(result);
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.reactionService.findOne(+id);
-  }
+    @Delete('post/:id')
+    async removePostReaction(
+        @Param('id') id: number,
+        @GetUser() user: User,
+    ): Promise<CoreResponse> {
+        await this.reactionService.removePostReaction(+id, user);
+        return { message: OPERATION_SUCCESSFUL_MESSAGE };
+    }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReactionDto: UpdateReactionDto) {
-    return this.reactionService.update(+id, updateReactionDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.reactionService.remove(+id);
-  }
+    @Delete('comment/:id')
+    async removeCommentReaction(
+        @Param('id') id: number,
+        @GetUser() user: User,
+    ): Promise<CoreResponse> {
+        await this.reactionService.removeCommentReaction(+id, user);
+        return { message: OPERATION_SUCCESSFUL_MESSAGE };
+    }
 }
