@@ -3,7 +3,7 @@ import { config } from 'dotenv';
 const envPath =
     process.env.NODE_ENV === 'development'
         ? '.development.env'
-        : './dist/.production.env';
+        : '.production.env';
 
 const configs = config({
     path: envPath,
