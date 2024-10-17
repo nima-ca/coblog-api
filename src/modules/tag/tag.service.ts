@@ -1,6 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { OrderDirection, PaginationMetaData } from 'src/common/dto/core.dto';
+import {
+    generateORMPagination,
+    generatePaginationMetaData,
+} from 'src/common/utils/pagination';
+import { Like, Repository } from 'typeorm';
+import { FindAllTagsQueryDto } from './dto/findTag.dto';
 import { Tag } from './entities/tag.entity';
 
 @Injectable()
@@ -22,7 +28,18 @@ export class TagService {
         );
     }
 
-    findAll() {
-        return `This action returns all tag`;
+    async findAll({
+        page = 1,
+        limit = 50,
+        search = '',
+        order = OrderDirection.DESC,
+    }: FindAllTagsQueryDto): Promise<[Tag[], PaginationMetaData]> {
+        const [tags, count] = await this.tagRepository.findAndCount({
+            order: { createdAt: order },
+            where: { name: Like(`%${search}%`) },
+            ...generateORMPagination(page, limit),
+        });
+
+        return [tags, generatePaginationMetaData(page, limit, count)];
     }
 }

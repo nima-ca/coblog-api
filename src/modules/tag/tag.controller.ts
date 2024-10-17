@@ -1,12 +1,20 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
+import { CorePaginatedResponse } from 'src/common/dto/core.dto';
+import { Public } from '../auth/decorators/public.decorator';
+import { FindAllTagsMapper, FindAllTagsQueryDto } from './dto/findTag.dto';
+import { Tag } from './entities/tag.entity';
 import { TagService } from './tag.service';
 
 @Controller({ path: 'tag', version: '1' })
 export class TagController {
     constructor(private readonly tagService: TagService) {}
 
+    @Public()
     @Get()
-    findAll() {
-        return this.tagService.findAll();
+    async findAll(
+        @Query() query: FindAllTagsQueryDto,
+    ): Promise<CorePaginatedResponse<Tag[]>> {
+        const result = await this.tagService.findAll(query);
+        return FindAllTagsMapper(result);
     }
 }
