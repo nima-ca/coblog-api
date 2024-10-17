@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { CorePaginatedResponse, CoreResponse } from 'src/common/dto/core.dto';
 import { OPERATION_SUCCESSFUL_MESSAGE } from 'src/common/messages/general.mesages';
+import { Public } from '../auth/decorators/public.decorator';
 import { Roles } from '../auth/decorators/role.decorator';
 import { UserRole } from '../user/entities/user.entity';
 import { CategoryService } from './category.service';
@@ -43,6 +44,7 @@ export class CategoryController {
         return CreateCategoryMapper(result);
     }
 
+    @Public()
     @Get()
     async findAll(
         @Query() query: FindAllCategoriesQueryDto,
@@ -51,6 +53,7 @@ export class CategoryController {
         return FindAllCategoriesMapper(result);
     }
 
+    @Public()
     @Get(':id')
     async findOne(@Param('id') id: string) {
         const result = await this.categoryService.findOne(+id);
