@@ -5,14 +5,13 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrderDirection, PaginationMetaData } from 'src/common/dto/core.dto';
-import { countByKey } from 'src/common/utils/count';
 import {
     generateORMPagination,
     generatePaginationMetaData,
 } from 'src/common/utils/pagination';
 import { Repository } from 'typeorm';
 import { Post } from '../post/entities/post.entity';
-import { ReactionType } from '../reaction/entities/reaction.entity';
+import { ReactionService } from '../reaction/reaction.service';
 import { User, UserRole } from '../user/entities/user.entity';
 import { CreateCommentDto } from './dto/createComment.dto';
 import { FindAllCommentsQueryDto } from './dto/findCommnets.dto';
@@ -27,6 +26,8 @@ export class CommentService {
 
         @InjectRepository(Post)
         private readonly postsRepository: Repository<Post>,
+
+        private readonly reactionService: ReactionService,
     ) {}
 
     async create(
@@ -50,12 +51,15 @@ export class CommentService {
         return comment;
     }
 
-    async findAll({
-        postId,
-        page = 1,
-        limit = 10,
-        order = OrderDirection.DESC,
-    }: FindAllCommentsQueryDto): Promise<[Comment[], PaginationMetaData]> {
+    async findAll(
+        {
+            postId,
+            page = 1,
+            limit = 10,
+            order = OrderDirection.DESC,
+        }: FindAllCommentsQueryDto,
+        user?: User,
+    ): Promise<[Comment[], PaginationMetaData]> {
         const [comments, count] = await this.commentsRepository.findAndCount({
             select: {
                 id: true,
@@ -82,49 +86,20 @@ export class CommentService {
             ...generateORMPagination(page, limit),
         });
 
-        // TODO: Check if user is reacted
+        const commentsWithReactionCount = comments.map((comment) => {
+            const userReaction = comment.reactions.find(
+                (reaction) => reaction.user.id === user?.id,
+            );
 
-        const commentsWithReactionCount = comments.map((comment) => ({
-            ...comment,
-            reactions: undefined,
-            reactionCounts: {
-                [ReactionType.LIKE]: countByKey(
+            return {
+                ...comment,
+                reactions: undefined,
+                userReaction: userReaction?.type ?? null,
+                reactionCounts: this.reactionService.countReactions(
                     comment.reactions,
-                    'type',
-                    ReactionType.LIKE,
                 ),
-                [ReactionType.ANGRY]: countByKey(
-                    comment.reactions,
-                    'type',
-                    ReactionType.ANGRY,
-                ),
-                [ReactionType.DISLIKE]: countByKey(
-                    comment.reactions,
-                    'type',
-                    ReactionType.DISLIKE,
-                ),
-                [ReactionType.LOVE]: countByKey(
-                    comment.reactions,
-                    'type',
-                    ReactionType.LOVE,
-                ),
-                [ReactionType.SAD]: countByKey(
-                    comment.reactions,
-                    'type',
-                    ReactionType.SAD,
-                ),
-                [ReactionType.THINK]: countByKey(
-                    comment.reactions,
-                    'type',
-                    ReactionType.THINK,
-                ),
-                [ReactionType.WOW]: countByKey(
-                    comment.reactions,
-                    'type',
-                    ReactionType.WOW,
-                ),
-            },
-        }));
+            };
+        });
 
         return [
             commentsWithReactionCount,

@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { CorePaginatedResponse, CoreResponse } from 'src/common/dto/core.dto';
 import { OPERATION_SUCCESSFUL_MESSAGE } from 'src/common/messages/general.mesages';
+import { Public } from '../auth/decorators/public.decorator';
 import { GetUser } from '../auth/decorators/user.decorator';
 import { User } from '../user/entities/user.entity';
 import { CommentService } from './comment.service';
@@ -37,8 +38,9 @@ export class CommentController {
     @Get()
     async findAll(
         @Query() query: FindAllCommentsQueryDto,
+        @GetUser() user: User,
     ): Promise<CorePaginatedResponse<Comment[]>> {
-        const result = await this.commentService.findAll(query);
+        const result = await this.commentService.findAll(query, user);
         return FindAllCommentsMapper(result);
     }
 
@@ -63,5 +65,20 @@ export class CommentController {
     ): Promise<CoreResponse> {
         await this.commentService.remove(+id, user);
         return { message: OPERATION_SUCCESSFUL_MESSAGE };
+    }
+}
+
+@Controller({ path: 'public/comment', version: '1' })
+export class PublicCommentController {
+    constructor(private readonly commentService: CommentService) {}
+
+    @Public()
+    @Get()
+    async findAll(
+        @Query() query: FindAllCommentsQueryDto,
+        @GetUser() user: User,
+    ): Promise<CorePaginatedResponse<Comment[]>> {
+        const result = await this.commentService.findAll(query, user);
+        return FindAllCommentsMapper(result);
     }
 }

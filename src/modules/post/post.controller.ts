@@ -12,6 +12,7 @@ import { GetQueryRunner } from 'src/common/decorators/transaction.decorator';
 import { CoreResponse } from 'src/common/dto/core.dto';
 import { OPERATION_SUCCESSFUL_MESSAGE } from 'src/common/messages/general.mesages';
 import { QueryRunner } from 'typeorm';
+import { Public } from '../auth/decorators/public.decorator';
 import { Roles } from '../auth/decorators/role.decorator';
 import { GetUser } from '../auth/decorators/user.decorator';
 import { User, UserRole } from '../user/entities/user.entity';
@@ -55,8 +56,11 @@ export class PostController {
     }
 
     @Get(':id')
-    async findOne(@Param('id') id: string): Promise<CoreResponse<PostEntity>> {
-        const result = await this.postService.findOne(+id);
+    async findOne(
+        @Param('id') id: string,
+        @GetUser() user: User,
+    ): Promise<CoreResponse<PostEntity>> {
+        const result = await this.postService.findOne(+id, user);
         return FindPostMapper(result);
     }
 
@@ -76,5 +80,24 @@ export class PostController {
     async remove(@Param('id') id: string): Promise<CoreResponse> {
         await this.postService.remove(+id);
         return { message: OPERATION_SUCCESSFUL_MESSAGE };
+    }
+}
+
+@Controller({ path: 'public/post', version: '1' })
+export class PublicPostController {
+    constructor(private readonly postService: PostService) {}
+
+    @Public()
+    @Get()
+    async findAll(@Query() query: FindPostsQueryDto) {
+        const result = await this.postService.findAll(query);
+        return FindAllPostsMapper(result);
+    }
+
+    @Public()
+    @Get(':id')
+    async findOne(@Param('id') id: string): Promise<CoreResponse<PostEntity>> {
+        const result = await this.postService.findOne(+id);
+        return FindPostMapper(result);
     }
 }

@@ -8,6 +8,7 @@ import {
 import { Like, QueryRunner, Repository } from 'typeorm';
 import { CategoryService } from '../category/category.service';
 import { Category } from '../category/entities/category.entity';
+import { ReactionService } from '../reaction/reaction.service';
 import { Tag } from '../tag/entities/tag.entity';
 import { User } from '../user/entities/user.entity';
 import { CreatePostDto } from './dto/createPost.dto';
@@ -20,8 +21,8 @@ export class PostService {
     constructor(
         @InjectRepository(Post)
         private readonly postRepository: Repository<Post>,
-
         private readonly categoryService: CategoryService,
+        private readonly reactionService: ReactionService,
     ) {}
 
     async create(
@@ -98,25 +99,50 @@ export class PostService {
         return [posts, generatePaginationMetaData(page, limit, count)];
     }
 
-    async findOne(id: number) {
+    async findOne(id: number, user?: User) {
         const post = await this.postRepository.findOne({
+            select: {
+                id: true,
+                title: true,
+                content: true,
+                createdAt: true,
+                updatedAt: true,
+
+                reactions: {
+                    id: true,
+                    type: true,
+                    user: {
+                        id: true,
+                    },
+                },
+            },
             where: { id },
             relations: {
                 tags: true,
                 author: true,
                 categories: true,
-                comments: {
+                reactions: {
                     user: true,
-                    reactions: true,
                 },
             },
         });
+
+        const userReaction = post.reactions.find(
+            (reaction) => reaction.user.id === user?.id,
+        );
+
+        const postWithCountedReactions = {
+            ...post,
+            reactions: undefined,
+            userReaction: userReaction?.type ?? null,
+            reactionCounts: this.reactionService.countReactions(post.reactions),
+        };
 
         if (!post) {
             throw new BadRequestException('post not found');
         }
 
-        return post;
+        return postWithCountedReactions;
     }
 
     async update(
