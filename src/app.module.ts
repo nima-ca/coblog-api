@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
+import { seconds, ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import configurations from 'src/configs/config';
 import { getDBCredentials } from 'src/configs/db/datasource';
@@ -24,6 +25,7 @@ import { UserModule } from './modules/user/user.module';
             load: [configurations],
             envFilePath: './src/configs/envs/.development.env',
         }),
+        ThrottlerModule.forRoot([{ ttl: seconds(1), limit: 10 }]),
         TypeOrmModule.forRoot({
             type: 'postgres',
             ...getDBCredentials(),
@@ -41,6 +43,10 @@ import { UserModule } from './modules/user/user.module';
     ],
     controllers: [],
     providers: [
+        {
+            provide: APP_GUARD,
+            useClass: ThrottlerGuard,
+        },
         {
             provide: APP_GUARD,
             useClass: JwtGuard,

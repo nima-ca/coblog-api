@@ -6,16 +6,22 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
+    // Add helmet for more security
+    app.use(helmet());
+
     // Version config
     app.enableVersioning({ type: VersioningType.URI });
 
-    // Enable swagger on development
-    if (process.env.NODE_ENV !== 'production') {
+    const isProductionEnv = process.env.NODE_ENV === 'production';
+
+    // Enable swagger on development env
+    if (!isProductionEnv) {
         const config = new DocumentBuilder()
             .setTitle('Coblog API')
             .setDescription('Coblog api documentation')
@@ -40,7 +46,15 @@ async function bootstrap() {
     );
 
     const configService = app.get(ConfigService);
-    const port = configService.get('PORT');
+    const port = configService.get('port');
+    const frontEndDomain = configService.get('frontEndDomain');
+
+    // Enable cors on production env
+    if (isProductionEnv) {
+        app.enableCors({
+            origin: frontEndDomain,
+        });
+    }
 
     await app.listen(port);
 }
