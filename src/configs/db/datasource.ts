@@ -9,6 +9,7 @@ export const getDBCredentials = () => {
         database: config.database.name,
         username: config.database.user,
         password: config.database.password,
+        ssl: config.database.sslMode,
     };
 };
 
@@ -16,7 +17,6 @@ export const getDataSourceOptions = (): DataSourceOptions => {
     return {
         type: 'postgres',
         ...getDBCredentials(),
-
         logging: true,
         entities: ['src/modules/**/*.entity.{js,ts}'],
         migrationsTableName: 'migration',

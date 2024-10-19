@@ -20,6 +20,8 @@ const configurations = () => ({
         password: configs.DB_PASSWORD,
 
         port: parseInt(configs.DB_PORT, 10) || 5432,
+
+        sslMode: configs.DB_SSL_MODE === 'true',
     },
 
     auth: {
