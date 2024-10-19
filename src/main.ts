@@ -49,6 +49,11 @@ async function bootstrap() {
     const port = configService.get('port');
     const frontEndDomain = configService.get('frontEndDomain');
 
+    // Enable cors on production env
+    app.enableCors({
+        origin: '*',
+    });
+
     await app.listen(port);
 }
 
