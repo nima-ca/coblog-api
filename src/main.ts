@@ -50,11 +50,9 @@ async function bootstrap() {
     const frontEndDomain = configService.get('frontEndDomain');
 
     // Enable cors on production env
-    if (isProductionEnv) {
-        app.enableCors({
-            origin: frontEndDomain,
-        });
-    }
+    app.enableCors({
+        origin: frontEndDomain,
+    });
 
     await app.listen(port);
 }
